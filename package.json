@@ -1,0 +1,16 @@
+{
+  "name": "mes-recettes",
+  "version": "1.0.0",
+  "description": "Partage de recettes de cuisine entre amis - temps reel",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.31.6",
+    "express": "^5.0.1",
+    "socket.io": "^4.7.5"
+  }
+}
