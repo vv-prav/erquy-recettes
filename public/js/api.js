@@ -23,6 +23,16 @@ export const api = {
       socket.emit('recipe:delete', id, (res) => resolve(res));
     });
   },
+  addReview(recipeId, review) {
+    return new Promise((resolve) => {
+      socket.emit('review:add', { recipeId, review }, (res) => resolve(res));
+    });
+  },
+  deleteReview(recipeId, reviewId) {
+    return new Promise((resolve) => {
+      socket.emit('review:delete', { recipeId, reviewId }, (res) => resolve(res));
+    });
+  },
   get connected() {
     return socket.connected;
   },

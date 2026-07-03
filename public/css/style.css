@@ -445,6 +445,179 @@ input:focus, textarea:focus, select:focus, button:focus-visible {
   background: linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,0) 55%, rgba(0,0,0,.1));
 }
 
+/* Cartes : conteneur + tag auteur cliquable */
+.card-row-wrap {
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px -8px rgba(91, 62, 150, 0.18);
+  overflow: hidden;
+}
+.card-row-wrap .card-row { box-shadow: none; border-radius: 0; }
+.author-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+.author-tag:active { background: var(--primary-pale); }
+
+.author-link {
+  display: inline-block;
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-top: 4px;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+
+.mini-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(239, 170, 60, .12);
+  padding: 3px 7px;
+  border-radius: 999px;
+}
+.mini-rating svg { color: var(--gold); }
+.mini-rating-media { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.92); }
+
+.hero-cta-outline {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  box-shadow: none;
+  border: 1.5px solid rgba(255,255,255,.4);
+}
+
+/* Étoiles */
+.star-row { display: inline-flex; gap: 1px; }
+.star { display: inline-flex; color: var(--line); }
+.star-filled { color: var(--gold); }
+.star svg, .mini-rating svg { display: block; width: 100%; height: 100%; }
+
+.rating-star {
+  width: 34px; height: 34px;
+  color: var(--line);
+  transition: color .1s ease, transform .1s ease;
+}
+.rating-star:active { transform: scale(0.9); }
+.rating-star-active { color: var(--gold); }
+
+/* Avis */
+.review-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 14px;
+  position: relative;
+}
+.review-avatar {
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  background: var(--primary-pale);
+  color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.review-photo {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-top: 10px;
+}
+.review-delete {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  color: var(--ink-faint);
+  padding: 4px;
+}
+
+.review-form {
+  background: var(--primary-pale);
+  border-radius: 24px;
+  padding: 16px;
+}
+.review-photo-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1.5px dashed rgba(91,62,150,.35);
+  background: #fff;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+.review-photo-preview {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  height: 120px;
+}
+.review-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.review-photo-preview button {
+  position: absolute;
+  top: 6px; right: 6px;
+  background: rgba(255,255,255,.9);
+  border-radius: 999px;
+  padding: 5px;
+}
+.review-submit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+.review-submit:disabled { background: rgba(91,62,150,.35); }
+
+/* Page profil auteur */
+.author-header {
+  position: relative;
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+  padding: 60px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 0 0 32px 32px;
+}
+.author-back-btn { position: absolute; top: 16px; left: 16px; }
+.author-avatar-lg {
+  width: 64px; height: 64px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.author-avatar-lg svg { width: 30px; height: 30px; }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+.gap-2\.5 { gap: 10px; }
+.mt-8 { margin-top: 32px; }
+.pt-5 { padding-top: 20px; }
+.text-white { color: #fff; }
+.text-white-85 { color: rgba(255,255,255,.85); }

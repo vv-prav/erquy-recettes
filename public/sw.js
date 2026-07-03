@@ -1,6 +1,6 @@
 // sw.js — service worker minimal : cache l'app shell, réseau prioritaire pour le reste
 // Incrémente CACHE_VERSION à chaque modif d'un fichier statique pour forcer la mise à jour.
-const CACHE_VERSION = 'mes-recettes-v1';
+const CACHE_VERSION = 'mes-recettes-v2';
 
 const APP_SHELL = [
   '/',
@@ -14,10 +14,12 @@ const APP_SHELL = [
   '/js/utils.js',
   '/js/components/card.js',
   '/js/components/bottomnav.js',
+  '/js/components/reviews.js',
   '/js/views/home.js',
   '/js/views/add.js',
   '/js/views/list.js',
   '/js/views/detail.js',
+  '/js/views/author.js',
 ];
 
 self.addEventListener('install', (event) => {

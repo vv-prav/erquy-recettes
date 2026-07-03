@@ -19,4 +19,8 @@ export const icons = {
   users: stroke('<circle cx="9" cy="8" r="3"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18.5 19a6 6 0 0 0-3.3-5.4"/>', 15),
   check: stroke('<path d="M4 12l5 5L20 6"/>', 16),
   wand: stroke('<path d="M4 20 15 9M17 3l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM4 4l.7 1.3L6 6l-1.3.7L4 8l-.7-1.3L2 6l1.3-.7z"/>', 15),
+  star: stroke('<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>', 16),
+  comment: stroke('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4H5.5A1.5 1.5 0 0 1 4 14.5z"/>', 16),
+  user: stroke('<circle cx="12" cy="8" r="3.3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>', 15),
+  image: stroke('<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M4 16.5 9 12l3 3 3.5-3.5L20 16"/>', 16),
 };

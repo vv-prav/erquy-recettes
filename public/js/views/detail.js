@@ -1,8 +1,9 @@
-// detail.js — fiche recette détaillée (ingrédients cochables, portions ajustables)
+// detail.js — fiche recette détaillée (ingrédients cochables, portions ajustables, avis)
 import { getCategory, getDifficultyLabel, getTagLabel } from '../presets.js';
 import { icons } from '../icons.js';
-import { escapeHtml } from '../utils.js';
+import { escapeHtml, averageRating } from '../utils.js';
 import { api } from '../api.js';
+import { renderReviews, mountReviews } from '../components/reviews.js';
 
 export function renderDetail(recipe) {
   const cat = getCategory(recipe.category);
@@ -25,9 +26,16 @@ export function renderDetail(recipe) {
 
       <div class="px-5 -mt-6 relative">
         <div class="detail-sheet">
-          <span class="cat-badge static-badge" style="background:${cat.color};color:${cat.text}">${escapeHtml(cat.label)}</span>
+          <div class="flex items-center justify-between">
+            <span class="cat-badge static-badge" style="background:${cat.color};color:${cat.text}">${escapeHtml(cat.label)}</span>
+            ${
+              averageRating(recipe.reviews) !== null
+                ? `<div class="flex items-center gap-1 text-[13px] font-semibold text-ink-soft">${icons.star} ${averageRating(recipe.reviews).toFixed(1)}</div>`
+                : ''
+            }
+          </div>
           <h1 class="font-display font-semibold text-[24px] text-ink mt-2.5 leading-tight">${escapeHtml(recipe.title)}</h1>
-          <p class="text-ink-soft text-[13px] mt-1">Par ${escapeHtml(recipe.author)}</p>
+          <button type="button" id="author-link" class="author-link">Par ${escapeHtml(recipe.author)}</button>
 
           <div class="flex gap-4 mt-4 border-y border-line py-3.5">
             <div class="meta-item">${icons.clock} ${recipe.prepTime} min</div>
@@ -84,17 +92,21 @@ export function renderDetail(recipe) {
                 : `<p class="text-ink-faint text-[13.5px] italic">Aucune étape renseignée.</p>`
             }
           </ol>
+
+          ${renderReviews(recipe)}
         </div>
       </div>
     </div>`;
 }
 
-export function mountDetail(container, recipe, { onBack, onDeleted }) {
+export function mountDetail(container, recipe, { onBack, onDeleted, onOpenAuthor, defaultAuthor }) {
   const $ = (sel) => container.querySelector(sel);
   let servings = recipe.servings || 1;
   const baseServings = recipe.servings || 1;
 
   $('#detail-back').addEventListener('click', onBack);
+
+  $('#author-link').addEventListener('click', () => onOpenAuthor?.(recipe.author));
 
   $('#detail-delete').addEventListener('click', async () => {
     if (!confirm('Supprimer cette recette pour tout le monde ?')) return;
@@ -132,4 +144,6 @@ export function mountDetail(container, recipe, { onBack, onDeleted }) {
       item.classList.toggle('ing-checked');
     });
   });
+
+  mountReviews(container, recipe, { defaultAuthor });
 }

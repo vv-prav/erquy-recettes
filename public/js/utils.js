@@ -24,3 +24,17 @@ export function debounce(fn, delay) {
     t = setTimeout(() => fn(...args), delay);
   };
 }
+
+export function averageRating(reviews) {
+  if (!reviews || reviews.length === 0) return null;
+  const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+  return sum / reviews.length;
+}
+
+export function formatDate(ts) {
+  try {
+    return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  } catch {
+    return '';
+  }
+}

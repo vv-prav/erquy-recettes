@@ -1,9 +1,11 @@
 // home.js — page d'accueil : CTA d'ajout + dernières recettes
 import { cardWide } from '../components/card.js';
+import { icons } from '../icons.js';
 
 export function renderHome(recipes) {
   const latest = [...recipes].sort((a, b) => b.createdAt - a.createdAt).slice(0, 8);
   const count = recipes.length;
+  const myAuthor = localStorage.getItem('mes-recettes-author') || '';
 
   return `
     <div class="pb-28">
@@ -13,10 +15,17 @@ export function renderHome(recipes) {
         <p class="hero-eyebrow">Entre amis</p>
         <h1 class="hero-title">Nos recettes, toutes au même endroit</h1>
         <p class="hero-sub">${count} recette${count > 1 ? 's' : ''} partagée${count > 1 ? 's' : ''} pour l'instant</p>
-        <button id="hero-add-btn" class="hero-cta">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          Ajouter une recette
-        </button>
+        <div class="flex gap-2.5 flex-wrap mt-6">
+          <button id="hero-add-btn" class="hero-cta">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Ajouter une recette
+          </button>
+          ${
+            myAuthor
+              ? `<button id="hero-mine-btn" class="hero-cta hero-cta-outline">${icons.user} Mes recettes</button>`
+              : ''
+          }
+        </div>
       </div>
 
       <div class="px-5 mt-7">

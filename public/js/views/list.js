@@ -1,10 +1,11 @@
-// list.js — liste complète avec recherche et filtres
+// list.js — liste complète avec recherche (titre + auteur), filtres catégorie, "Mes recettes"
 import { CATEGORIES } from '../presets.js';
 import { icons } from '../icons.js';
 import { cardRow } from '../components/card.js';
-import { escapeAttr } from '../utils.js';
 
 export function renderList(recipes) {
+  const myAuthor = localStorage.getItem('mes-recettes-author') || '';
+
   return `
     <div class="pb-28 px-5 pt-8">
       <h1 class="font-display font-semibold text-[26px] text-ink">Toutes les recettes</h1>
@@ -12,7 +13,7 @@ export function renderList(recipes) {
 
       <div class="mt-5 relative">
         <span class="search-icon">${icons.search}</span>
-        <input id="search-input" placeholder="Rechercher une recette..." class="field pl-10" />
+        <input id="search-input" placeholder="Recette ou nom d'un ami..." class="field pl-10" />
       </div>
 
       <div class="flex gap-2 overflow-x-auto no-scrollbar mt-3 -mx-5 px-5 pb-1" id="cat-filters">
@@ -20,6 +21,11 @@ export function renderList(recipes) {
         ${CATEGORIES.map(
           (c) => `<button type="button" class="chip flex-shrink-0 chip-inactive filter-chip" data-cat="${c.id}" data-color="${c.color}" data-text="${c.text}">${c.label}</button>`
         ).join('')}
+        ${
+          myAuthor
+            ? `<button type="button" class="chip flex-shrink-0 chip-inactive" id="mine-toggle">${icons.user} Mes recettes</button>`
+            : ''
+        }
       </div>
 
       <div class="mt-5 space-y-3" id="results">
@@ -39,13 +45,16 @@ export function mountList(container, recipes) {
   const $ = (sel) => container.querySelector(sel);
   const results = $('#results');
   const searchInput = $('#search-input');
+  const myAuthor = localStorage.getItem('mes-recettes-author') || '';
   let activeCat = 'tous';
+  let onlyMine = false;
 
   function apply() {
     const q = searchInput.value.trim().toLowerCase();
     const filtered = recipes
       .filter((r) => (activeCat === 'tous' ? true : r.category === activeCat))
-      .filter((r) => r.title.toLowerCase().includes(q))
+      .filter((r) => (onlyMine ? r.author === myAuthor : true))
+      .filter((r) => r.title.toLowerCase().includes(q) || (r.author || '').toLowerCase().includes(q))
       .sort((a, b) => b.createdAt - a.createdAt);
     results.innerHTML = filtered.length ? filtered.map(cardRow).join('') : emptyState();
   }
@@ -70,5 +79,12 @@ export function mountList(container, recipes) {
       activeCat = btn.dataset.cat;
       apply();
     });
+  });
+
+  $('#mine-toggle')?.addEventListener('click', (e) => {
+    onlyMine = !onlyMine;
+    e.currentTarget.classList.toggle('chip-active', onlyMine);
+    e.currentTarget.classList.toggle('chip-inactive', !onlyMine);
+    apply();
   });
 }

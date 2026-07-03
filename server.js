@@ -50,6 +50,9 @@ async function loadRecipes() {
       recipes = [];
     }
   }
+  recipes.forEach((r) => {
+    if (!Array.isArray(r.reviews)) r.reviews = [];
+  });
   console.log(`📖 ${recipes.length} recette(s) chargée(s).`);
 }
 
@@ -134,6 +137,34 @@ function sanitizeRecipe(input) {
     ingredients,
     steps,
     image,
+    reviews: [],
+    createdAt: Date.now(),
+  };
+}
+
+const MAX_COMMENT = 600;
+
+function sanitizeReview(input) {
+  if (!input || typeof input !== 'object') return null;
+  const author = cleanStr(input.author, 40) || 'Anonyme';
+  const comment = cleanStr(input.comment, MAX_COMMENT);
+  let rating = Math.round(Number(input.rating));
+  if (!Number.isFinite(rating)) rating = 0;
+  rating = Math.max(1, Math.min(5, rating));
+
+  let image = null;
+  if (typeof input.image === 'string' && input.image.startsWith('data:image/')) {
+    if (input.image.length <= 1_500_000) image = input.image;
+  }
+
+  if (!comment && !image) return null; // un avis doit dire ou montrer quelque chose
+
+  return {
+    id: crypto.randomUUID(),
+    author,
+    rating,
+    comment,
+    image,
     createdAt: Date.now(),
   };
 }
@@ -142,6 +173,16 @@ function sanitizeRecipe(input) {
 // Statique + Socket.io
 // ---------------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Petite route pour vérifier en un coup d'oeil si Redis est bien branché en prod.
+// À visiter directement : https://ton-app.onrender.com/healthz
+app.get('/healthz', (req, res) => {
+  res.json({
+    ok: true,
+    storage: useRedis ? 'upstash-redis' : 'local-json-fallback',
+    recipesCount: recipes.length,
+  });
+});
 
 io.on('connection', (socket) => {
   socket.emit('recipes:update', recipes);
@@ -161,6 +202,33 @@ io.on('connection', (socket) => {
   socket.on('recipe:delete', (id, ack) => {
     if (typeof id !== 'string') return;
     recipes = recipes.filter((r) => r.id !== id);
+    scheduleSave();
+    io.emit('recipes:update', recipes);
+    if (typeof ack === 'function') ack({ ok: true });
+  });
+
+  socket.on('review:add', ({ recipeId, review } = {}, ack) => {
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (!recipe) {
+      if (typeof ack === 'function') ack({ ok: false, error: 'Recette introuvable.' });
+      return;
+    }
+    const clean = sanitizeReview(review);
+    if (!clean) {
+      if (typeof ack === 'function') ack({ ok: false, error: 'Avis invalide.' });
+      return;
+    }
+    if (!Array.isArray(recipe.reviews)) recipe.reviews = [];
+    recipe.reviews.unshift(clean);
+    scheduleSave();
+    io.emit('recipes:update', recipes);
+    if (typeof ack === 'function') ack({ ok: true, review: clean });
+  });
+
+  socket.on('review:delete', ({ recipeId, reviewId } = {}, ack) => {
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (!recipe || !Array.isArray(recipe.reviews)) return;
+    recipe.reviews = recipe.reviews.filter((rv) => rv.id !== reviewId);
     scheduleSave();
     io.emit('recipes:update', recipes);
     if (typeof ack === 'function') ack({ ok: true });

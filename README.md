@@ -11,6 +11,40 @@ Reconstruite avec ta stack habituelle : Node + Express 5 + Socket.io (CommonJS),
 - **Persistance** : Upstash Redis en prod (détection automatique via variables d'env), repli sur `recipes.json` en local.
 - **Le serveur fait autorité** : toutes les recettes sont validées et nettoyées côté serveur (`sanitizeRecipe` dans `server.js`) avant d'être diffusées à tout le monde via `io.emit('recipes:update', ...)`.
 
+## Vérifier que Redis est bien branché
+
+Redis ne se connecte **jamais automatiquement** : il faut créer une base sur [upstash.com](https://upstash.com) (offre gratuite) et coller ses deux clés dans les variables d'environnement de ton hébergeur.
+
+Pour vérifier en un coup d'œil que c'est bien pris en compte, visite :
+
+```
+https://ton-app.onrender.com/healthz
+```
+
+Tu dois voir `"storage":"upstash-redis"`. Si tu vois `"storage":"local-json-fallback"`, les variables ne sont pas détectées (vérifie les noms exacts `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` dans Render → Environment, puis redéploie). Les logs du service au démarrage affichent aussi clairement lequel des deux modes est actif.
+
+## Déployer sur Render
+
+1. Pousse ce dossier sur un dépôt GitHub.
+2. Sur [render.com](https://render.com) → **New +** → **Web Service** (⚠️ pas "Static Site" — il faut qu'un process Node tourne en continu pour Express + Socket.io).
+3. Connecte le repo.
+4. Build command : `npm install` — Start command : `npm start`. Laisse "Root Directory" et "Publish Directory" vides (ils n'existent même pas pour un Web Service).
+5. Dans **Environment**, ajoute `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN`.
+
+⚠️ Sur Render le disque est éphémère : **sans les variables Redis, les recettes ne survivront pas à un redéploiement**. Avec Redis configuré, tout est persistant et partagé entre tous tes amis, peu importe leur appareil.
+
+## Fonctionnalités
+
+### Recettes par auteur
+- Le nom de l'auteur est cliquable partout (carte, fiche recette) → ouvre sa page profil avec toutes ses recettes, sa note moyenne et son nombre d'avis reçus.
+- Dans l'onglet **Recettes**, la recherche filtre aussi par nom d'auteur, et un bouton **"Mes recettes"** apparaît dès qu'un prénom a été renseigné une fois (stocké en local sur l'appareil).
+- L'accueil affiche un raccourci **"Mes recettes"** dans le hero dès qu'un prénom est connu.
+
+### Avis (note, commentaire, photo)
+- En bas de chaque fiche recette : note moyenne affichée à côté du titre, liste des avis (auteur, date, étoiles, commentaire, photo du plat réalisé), et un formulaire pour en laisser un nouveau.
+- Seule la note (1 à 5 étoiles) est obligatoire ; commentaire et photo sont optionnels.
+- Tout est envoyé en temps réel : si quelqu'un laisse un avis pendant que tu regardes la même recette, il apparaît instantanément sans recharger. Si tu es en train d'écrire ton propre commentaire à ce moment-là, ton brouillon est préservé.
+
 ## Démarrer en local
 
 ```bash
@@ -63,12 +97,14 @@ mes-recettes/
         ├── utils.js              ← escapeHtml / escapeAttr (protection XSS)
         ├── components/
         │   ├── card.js            ← carte recette (grille + format large)
-        │   └── bottomnav.js        ← barre d'onglets
+        │   ├── bottomnav.js        ← barre d'onglets
+        │   └── reviews.js           ← liste des avis + formulaire (note/commentaire/photo)
         └── views/
             ├── home.js              ← accueil (CTA + dernières recettes)
             ├── add.js                ← formulaire d'ajout optimisé mobile
             ├── list.js                ← liste avec recherche + filtres
-            └── detail.js               ← fiche recette (ingrédients cochables, portions ajustables)
+            ├── detail.js               ← fiche recette (ingrédients, portions, avis)
+            └── author.js                ← page "recettes de {auteur}"
 ```
 
 ## ⚠️ Rappel de workflow
